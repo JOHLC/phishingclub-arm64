@@ -102,13 +102,13 @@ jobs:
           context: .
           file: ./Dockerfile.release
           push: true
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           tags: |
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ steps.get_version.outputs.VERSION }}
           labels: |
             org.opencontainers.image.title=PhishingClub ${{ steps.get_version.outputs.VERSION }}
-            org.opencontainers.image.description=PhishingClub production release image (linux/amd64). Built from tag ${{ steps.get_version.outputs.TAG }}.
+            org.opencontainers.image.description=PhishingClub production release image (linux/amd64, linux/arm64). Built from tag ${{ steps.get_version.outputs.TAG }}.
             org.opencontainers.image.url=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.version=${{ steps.get_version.outputs.VERSION }}
