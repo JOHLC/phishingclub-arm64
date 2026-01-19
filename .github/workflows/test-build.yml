@@ -117,6 +117,9 @@ jobs:
           file: ./Dockerfile.release
           push: true
           platforms: linux/amd64,linux/arm64
+          build-args: |
+            VERSION=${{ steps.get_version.outputs.VERSION }}
+            HASH=${{ steps.get_version.outputs.HASH }}
           tags: |
             ghcr.io/${{ github.repository }}:test-latest
           labels: |
