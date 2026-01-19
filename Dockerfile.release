@@ -1,3 +1,28 @@
+# Build stage - builds the Go binary for the target architecture
+FROM golang:1.25.1 AS builder
+
+# Build arguments
+ARG TARGETARCH
+ARG VERSION=unknown
+ARG HASH=unknown
+
+WORKDIR /build
+
+# Copy go mod files
+COPY backend/go.mod backend/go.sum ./
+RUN go mod download
+
+# Copy backend source
+COPY backend/ ./
+
+# Build the binary with CGO enabled for SQLite support
+# Using native compilation for the target architecture
+RUN CGO_ENABLED=1 \
+    go build -trimpath \
+    -ldflags="-X github.com/phishingclub/phishingclub/version.hash=ph${HASH} -X github.com/phishingclub/phishingclub/version.version=${VERSION}" \
+    -tags production -o /phishingclub main.go
+
+# Runtime stage - creates the final minimal image
 FROM debian:12-slim
 
 # install ca-certificates for https requests
@@ -12,8 +37,8 @@ RUN groupadd -g 1000 appuser && \
 # set working directory
 WORKDIR /app
 
-# copy the binary from build context
-COPY build/phishingclub /app/phishingclub
+# copy the binary from builder stage
+COPY --from=builder /phishingclub /app/phishingclub
 
 # make binary executable and set ownership
 RUN chmod +x /app/phishingclub && \
